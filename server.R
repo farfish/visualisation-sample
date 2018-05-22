@@ -1,6 +1,9 @@
 library(DBI)
 library(jsonlite)
 library(pool)
+library(ggplot2)
+library(patchwork)
+
 
 getDocumentNames <- function (con, template_name='dlmtool') {
     res <- dbSendQuery(con, paste0(
@@ -69,10 +72,21 @@ server <- function(input, output, session) {
     poolReturn(conn)
     catch <- ffdbToDataFrame(out$catch)
 
-    barplot(
-        as.numeric(catch$catch),
-        names.arg = rownames(catch),
-    )
+    theme_set(theme_bw())
+    catch$year <- rownames(catch)
+    p1<-ggplot(catch, aes(year,catch)) +
+        geom_bar(stat="identity") +
+        ylab("Catch (in tonnes)") +
+        theme(text = element_text(size=11), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        theme(axis.title.x = element_blank()) +
+        scale_x_discrete(catch$year)
+    p2<-ggplot(catch, aes(year,abundance_index)) +
+        geom_bar(stat="identity") +
+        ylab("Relative abundance") +
+        theme(text = element_text(size=11), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        theme(axis.title.x = element_blank()) +
+        scale_x_discrete(catch$year)
+    p1 + p2 +plot_layout(ncol = 1, heights = c(2, 2))
   })
 }
 
