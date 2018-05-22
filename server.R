@@ -31,11 +31,15 @@ getDLMToolData <- function (con, document_name) {
 
 # Convert ffdb list with _headings into a regular data frame
 ffdbToDataFrame <- function (l) {
-    as.data.frame(sapply(
-        l[['_headings']]$fields,
-        function (x) l[[x]],
-        USE.NAMES = TRUE
-    ), row.names=l[['_headings']]$values, stringsAsFactors = FALSE)
+    # Convert list of all column (string) vectors to integer, if possible, handling NA's.
+    column_names <- l[['_headings']]$fields
+    out <- lapply(l[column_names], function (x) utils::type.convert(x, as.is = TRUE))
+
+    # Turn this into a data.frame, put row headings in
+    row_names <- l[['_headings']]$values
+    out <- as.data.frame(out, row.names=row_names, stringsAsFactors = FALSE)
+
+    return(out)
 }
 
 
