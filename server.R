@@ -2,14 +2,6 @@ library(DBI)
 library(jsonlite)
 library(pool)
 
-pool <- dbPool(
-  drv = RPostgres::Postgres(),
-  dbname = 'ffdb_db'
-)
-onStop(function() {
-  poolClose(pool)
-})
-
 getDocumentNames <- function (con, template_name='dlmtool') {
     res <- dbSendQuery(con, paste0(
         "SELECT DISTINCT document_name",
@@ -49,6 +41,15 @@ ffdbToDataFrame <- function (l) {
 
 # Define server logic required to draw a histogram ----
 server <- function(input, output, session) {
+
+  # Open DB pool
+  pool <- dbPool(
+    drv = RPostgres::Postgres(),
+    dbname = 'ffdb_db'
+  )
+  onStop(function() {
+    poolClose(pool)
+  })
 
   conn <- poolCheckout(pool)
   updateSelectInput(session, "document_name", choices = getDocumentNames(conn))
