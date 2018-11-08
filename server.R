@@ -80,7 +80,7 @@ server <- function(input, output, session) {
         theme(text = element_text(size=11), axis.text.x = element_text(angle = 90, hjust = 1)) +
         theme(axis.title.x = element_blank()) +
         scale_x_discrete(catch$year)
-    p2<-ggplot(catch, aes(year,abundance_index)) +
+    p2<-ggplot(catch, aes(year,abundance_index_1)) +
         geom_bar(stat="identity") +
         ylab("Relative abundance") +
         theme(text = element_text(size=11), axis.text.x = element_text(angle = 90, hjust = 1)) +
